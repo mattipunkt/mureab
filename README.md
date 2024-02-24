@@ -1,5 +1,5 @@
 # mureab
-a system for music editorial offices
+a system for music editorial offices built using django and bootstrap.
 
 
 ### this project is work in progress
