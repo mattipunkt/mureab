@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+        body {
+            padding-left: 1.5%;
+            padding-right: 1.5%;
+        }
+    </style>
+    <title>{{ title }}</title>
+</head>
+<body>
+    <!--  START BODY   -->    
+
+    <h1>mureab - Das Musikredaktionssystem</h1>
+    <div class="d-md-flex justify-content-md-end">
+        <a class="btn btn-primary" data-bs-toggle="collapse" href="#addNewSong" role="button" aria-expanded="false" aria-controls="collapseExample">
+            Neuen Song vorschlagen
+        </a>
+    </div>
+
+    <!--  NEW SONG BREADCRUMB -->
+    <div class="collapse" id="addNewSong">
+        <div class="card card-body">
+            <h2>Einen neuen Song vorschlagen</h2><br>
+            <!-- NEW SONG FORM -->
+            <form id="addNewSongForm">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="title" name="title" placeholder="Never Gonna Give You Up">
+                    <label for="title">Titel</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="artist" name="artist" placeholder="Rick Astley">
+                    <label for="artist">Künstler*innen</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="link" name="link" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+                    <label for="link">Link zum Inhalt</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Abschicken</button>
+            </form>
+            
+        </div>
+      </div><br><br>    
+
+    <!-- LIST OF ACTIVE SONGS -->
+    
+    <div class="accordion accordion-flush" id="activesonglist">
+        {% for song in songs %}
+        <!-- SONG BUTTON -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="flush-headingOne">
+                <button
+                    class="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#{{ song.id }}"
+                    aria-expanded="true"
+                    aria-controls="flush-collapseOne"
+                >
+                    {{ song.artist }} - {{ song.title }}
+                </button>
+            </h2>
+            <!-- SONG ACCORDEON BODY -->
+            <div
+                id="{{ song.id }}"
+                class="accordion-collapse collapse"
+                aria-labelledby="flush-headingOne"
+                data-bs-parent="#accordionFlushExample"
+            >
+                <div class="container">
+                    <div class="row justify-content-md-center">
+                        <!-- LEFT COLUMN-->
+                        <div class="col">
+                            <div class="accordeon-body">
+                                <br>
+                                <h4>{{ song.artist }}</h4>
+                                <h5>{{ song.title }}</h5>
+                                <div class="btn-group-vertical" role="group" aria-label="Votes">
+                                    <button type="button" class="btn btn-success" id="{{ song.id }}-for" onclick="sendDataToDjango('{{ song.id }}', 'FOR')">Dafür ({{ song_votes_counts.for_count }})</button>
+                                    <button type="button" class="btn btn-danger" id="{{ song.id }}-against" onclick="sendDataToDjango('{{ song.id }}', 'AGAINST')">Dagegen</button>
+                                    <button type="button" class="btn btn-info" id="{{ song.id }}-night" onclick="sendDataToDjango('{{ song.id }}', 'NIGHT')">Nachtrotation</button>
+                                    <button type="button" class="btn btn-outline-secondary" id="{{ song.id }}-abstain" onclick="sendDataToDjango('{{ song.id }}', 'ABSTAIN')">Enthaltung</button>
+                                </div>
+                                <script>
+                                    
+                                </script>
+                            </div>
+                        </div>
+                        <!-- RIGHT COLUMN -->
+                        <div class="col-md-auto">
+                            <br>
+                            <div id="youtubeFrame_{{ song.id }}"></div>
+                            <script>
+                                function ytGetId(url) {
+                                    var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                                    var match = url.match(regExp);
+            
+                                    if (match && match[2].length == 11) {
+                                        return match[2];
+                                    } else {
+                                        return 'error';
+                                    }
+                                    };
+            
+                                var videoId = ytGetId('{{ song.link }}');
+                                var iframeHtml = '<iframe width="560" height="315" src="//www.youtube.com/embed/' + videoId + '" frameborder="0" allowfullscreen></iframe>';
+            
+                                document.getElementById('youtubeFrame_{{ song.id }}').innerHTML = iframeHtml;      
+                            </script>
+                        </div>
+                    </div>
+                </div>    
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+    <script>
+        document.getElementById('addNewSongForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            var token = '{{ csrf_token }}'
+
+            fetch('addsong/', {method: 'POST', headers: {'X-CSRFToken': token}, body: formData, })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network Response was not okay');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Daten konnten geschickt werden!', data);
+                updateTable();
+
+            })
+            .catch(error => {
+                console.error('Fehler in der Übertragung!', data);
+            });
+        });
+
+        function updateTable() {
+            $( "#activesonglist" ).load(window.location.href + " #activesonglist");
+        };
+
+
+        function sendDataToDjango(songID, data) {
+            var token = '{{ csrf_token }}';
+            const voteSubmit = new FormData();
+            voteSubmit.append('song_id', songID);
+            voteSubmit.append('value', data);
+                                        
+            fetch('addvote/', {
+                method: 'POST',
+                headers: {'X-CSRFToken': token},
+                body: voteSubmit,
+            })
+            .then(response => {console.log("Vote wurde erfolgereich übermittelt.")})
+            .then(error => {console.log("Fehler beim Übertragen des Votes")});
+        };
+
+    </script>
+    
+    
+</body>
+</html>
