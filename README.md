@@ -6,7 +6,7 @@ a system for music editorial offices built using django and bootstrap.
 
 ## aim
 the aim of this project is to make votings and editorial sessions more effecient. this project is (/tries to be) a one-pager, which lets you add songs to a database, and vote for them.
-currently working on: showing the vote count next to every vote-possibility
+currently working on: automatically updating vote-count, after voting without reloading the complete site.
 
 
 ## try yourself
