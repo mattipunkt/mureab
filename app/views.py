@@ -9,25 +9,11 @@ from .models import Vote
 # Create your views here.
 def index(request):
     songs = Song.objects.order_by("-pub_date")
-    song_votes_counts = []
-
-    for song in songs:
-        votes = Vote.objects.filter(song=song)
-        votes_count = {
-            'song': song,
-            'for_count': votes.filter(vote='FOR').count(),
-            'against_count': votes.filter(vote='AGAINST').count(),
-            'night_count': votes.filter(vote='NIGHT').count(),
-            'abstain_count': votes.filter(vote='ABSTAIN').count(),
-        }
-        song_votes_counts.append(votes_count)
-
     
     return render(request, 
                   "index.html", 
                   {
                       "songs": songs, 
-                      "song_votes_counts": song_votes_counts,
                       }
                   )
 
@@ -44,10 +30,29 @@ def addSong(request):
     
 def addVote(request):
     if request.method == 'POST':
-        vote = request.POST.get('value')
+        value = request.POST.get('value')
         song_id = request.POST.get('song_id')
-        song = get_object_or_404(Song, pk=song_id)
+        song = get_object_or_404(Song, id=song_id)
+
+        print("addVote called:")
+        print('Song-value: ' + value)
+        print('SongID: ' + song_id)
         
-        vote = Vote.objects.create(song=song, vote=vote)
-        return HttpResponse("Das hat geklappt!")
-    else: return HttpResponse("Das hat nicht geklappt!")
+        if value == 'FOR':
+            song.for_votes += 1
+            song.save()
+            return HttpResponse("FOR-Vote added")
+        elif value == 'AGAINST':
+            song.against_votes += 1
+            song.save()
+            return HttpResponse("AGAINST-Vote added")
+        elif value == 'NIGHT':
+            song.night_votes += 1
+            song.save()
+            return HttpResponse("NIGHT-Vote added")
+        elif value == 'ABSTAIN':
+            song.abstain_votes += 1
+            song.save()
+            return HttpResponse("ABSTAIN-Vote added")
+        else: return HttpResponse("Error in POST-Request")
+
