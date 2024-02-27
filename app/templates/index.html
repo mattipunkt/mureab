@@ -12,12 +12,12 @@
             padding-right: 1.5%;
         }
     </style>
-    <title>{{ title }}</title>
+    <title>- MuReAb</title>
 </head>
 <body>
+    {% include "navbar.html" %}
     <!--  START BODY   -->    
 
-    <h1>mureab - Das Musikredaktionssystem</h1>
     <div class="d-md-flex justify-content-md-end">
         <a class="btn btn-primary" data-bs-toggle="collapse" href="#addNewSong" role="button" aria-expanded="false" aria-controls="collapseExample">
             Neuen Song vorschlagen
@@ -26,6 +26,7 @@
 
     <!--  NEW SONG BREADCRUMB -->
     <div class="collapse" id="addNewSong">
+        <br>
         <div class="card card-body">
             <h2>Einen neuen Song vorschlagen</h2><br>
             <!-- NEW SONG FORM -->

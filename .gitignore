@@ -11,3 +11,4 @@ app/migrations/__pycache__/0003_vote_user.cpython-311.pyc
 app/migrations/__pycache__/0004_alter_vote_vote.cpython-311.pyc
 app/migrations/__pycache__/0005_alter_song_pub_date.cpython-311.pyc
 app/migrations/__pycache__/0006_song_abstain_votes_song_against_votes_song_for_votes_and_more.cpython-311.pyc
+db.sqlite3

@@ -13,7 +13,5 @@ class Song(models.Model):
     pub_date = models.CharField(max_length=20, default=date.today())
     
 
-class Vote(models.Model):
-    song = models.ForeignKey(Song, on_delete=models.CASCADE)
-    vote = models.CharField(max_length=20)
-    user = models.CharField(max_length=100, default="Max Mustermann")
+class User(models.Model):
+    name = models.CharField(max_length=100, default="Max Mustermann")
